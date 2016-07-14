@@ -1,0 +1,64 @@
+# mraa-clj
+Clojure for the mraa library
+
+https://github.com/intel-iot-devkit/mraa[mraa]
+
+
+== prep
+
+1. On the Edison set the environment var JAVA_HOME; on my Edison
+that's `/usr/lib/jvm/java-8-openjdk`.  Also add $JAVA_HOME/bin to the
+PATH.
+
+2.  Install http://boot-clj.com/[boot] on the Edison.  If you get an
+SSL exception follow the instructions at
+http://blog.mobileink.com/2016/07/java-cacerts-on-intel-edisons-and.html[Java
+cacerts on Intel Edisons and Gateways].
+
+2. On the Edison, package the mraa jar (`/usr/lib/java/mraa.jar`) as a
+maven artifact and install in the local repository:
+
+WARNING: We're using the `root` account on the Edison, since the
+`mraa` library must run as root in order to control the hardware.
+`boot` by default will refuse to run as `root`, so you'll need to
+execute `$ export BOOT_AS_ROOT=yes` before running `boot`.
+
+[source,sh]
+----
+$ mkdir -p clj/mraa && cd clj/mraa
+$ boot pom -p mraa/mraa -v 1.0.0 target
+$ boot install -p target/META-INF/maven/mraa/mraa/pom.xml -f /usr/lib/java/mraa.jar
+$ ls ~/.m2/repository/mraa/mraa/1.0.0
+-rw-r--r-- 1 root root   160 Jul 14 14:25 _maven.repositories
+-rw-r--r-- 1 root root 29038 Jun  6 22:37 mraa-1.0.0.jar
+-rw-r--r-- 1 root root   484 Jul 14 14:25 mraa-1.0.0.pom
+$ jar tf ~/.m2/repository/mraa/mraa/1.0.0/mraa-1.0.0.jar
+META-INF/
+META-INF/MANIFEST.MF
+mraa/
+mraa/IntelEdisonMiniboard.class
+mraa/UartParity.class
+mraa/Platform.class
+mraa/I2cMode.class
+mraa/Gpio.class
+mraa/mraa.class
+mraa/RaspberryWiring.class
+mraa/I2c.class
+mraa/mraaJNI.class
+mraa/Edge.class
+mraa/Pinmodes.class
+mraa/IntelEdison.class
+mraa/Spi.class
+mraa/Mode.class
+mraa/Dir.class
+mraa/Pwm.class
+mraa/Aio.class
+mraa/Uart.class
+mraa/Spi_Mode.class
+mraa/Result.class
+$ rm -rf target   # no longer needed
+----
+
+Doing it this way makes it easy to ensure the mraa classes are on the
+classpath by including the maven artifact as a project dependency in
+`build.boot`.
